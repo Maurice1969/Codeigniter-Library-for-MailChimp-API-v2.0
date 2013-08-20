@@ -45,26 +45,10 @@ class MCAPI {
         } else {
             $this->secure = false;
         }
-        $this->api_server = substr($config["apikey"], -2, 2);
+        $this->api_server = substr($config["apikey"], -3, 3);
         $this->api_key = $config['apikey'];
         $this->apiUrl = parse_url("https://".$this->api_server."mailchimp.com/" . $this->version);
 
-    }
-    function setTimeout($seconds){
-        if (is_int($seconds)){
-            $this->timeout = $seconds;
-            return true;
-        }
-    }
-    function getTimeout(){
-        return $this->timeout;
-    }
-    function useSecure($val){
-        if ($val===true){
-            $this->secure = true;
-        } else {
-            $this->secure = false;
-        }
     }
 
     /**
@@ -78,7 +62,7 @@ class MCAPI {
      * @returnf string html The HTML content used for the campaign with merge tags intact
      * @returnf string text The Text content used for the campaign with merge tags intact
      */
-    function campaignsContent($cid, $options) {
+    function campaignsContent($cid, $options = NULL) {
         $params = array();
         $params["cid"] = $cid;
         $params["options"] = $options;
@@ -241,7 +225,7 @@ class MCAPI {
     array type_opts the type-specific options for the campaign - can be passed to campaignCreate()
      */
     function campaignsList($filters=array (
-    ), $start, $limit, $sort_field = "create_time", $sort_dir = "DESC") {
+    ), $start = 0, $limit = 100, $sort_field = "create_time", $sort_dir = "DESC") {
         $params = array();
         $params["filters"] = $filters;
         $params["start"] = $start;
@@ -1041,7 +1025,6 @@ class MCAPI {
         $params["limit"] = $limit;
         $params["sort_field"] = $sort_field;
         $params["sort_dir"] = $sort_dir;
-
         return $this->callServer("lists/list", $params);
     }
 
@@ -1146,7 +1129,7 @@ class MCAPI {
     string reason For unsubscribes only - the reason collected for the unsubscribe. If populated, one of 'NORMAL','NOSIGNUP','INAPPROPRIATE','SPAM','OTHER'
     string reason_text For unsubscribes only - if the reason is OTHER, the text entered.
      */
-    function listsMembers($id, $status='subscribed', $opts) {
+    function listsMembers($id, $status='subscribed', $opts = NULL) {
         $params = array();
         $params["id"] = $id;
         $params["status"] = $status;
@@ -2334,7 +2317,9 @@ class MCAPI {
 
         $params['apikey'] = $this->api_key;
 
+
         $url = 'https://'.$this->api_server.'.api.mailchimp.com/2.0/'.$method.'.json';
+
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
